@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tambah Divisi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/divisi-form.css">
+</head>
+<body class="min-h-screen flex">
+
+  <div id="sidebar-container"></div>
+
+  <main class="flex-1 overflow-y-auto p-8">
+
+    <!-- Back -->
+    <div class="mb-8 a1">
+      <a href="divisi-list.html" class="back-btn">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Kembali ke Daftar
+      </a>
+    </div>
+
+    <!-- Split Layout -->
+    <div class="flex gap-0 a2" style="align-items: flex-start;">
+
+      <!-- Kiri: Preview -->
+      <div class="split-left">
+        <div>
+          <div class="preview-icon" id="previewIcon">?</div>
+          <p class="text-xs font-bold tracking-widest uppercase mb-4" style="color:rgba(255,255,255,.25);">Preview Divisi</p>
+          <div class="preview-title" id="previewTitle">Nama divisi akan muncul di sini</div>
+          <div class="preview-desc" id="previewDesc">Deskripsi divisi akan muncul di sini setelah kamu mengisi form di sebelah kanan.</div>
+        </div>
+        <div class="preview-tag">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+          </svg>
+          Divisi Baru
+        </div>
+      </div>
+
+      <!-- Kanan: Form -->
+      <div class="split-right">
+        <div class="mb-8 a2">
+          <p class="text-[10px] font-bold tracking-[.2em] uppercase text-gray-400 mb-1">Manajemen Divisi</p>
+          <h1 class="font-extrabold text-4xl text-gray-900 leading-tight">Tambah Divisi</h1>
+          <p class="text-sm text-gray-400 mt-1.5">Isi data divisi baru, preview akan muncul secara langsung</p>
+        </div>
+
+        <form id="createForm" class="space-y-6">
+
+          <div class="a3">
+            <label class="form-label" for="nama">Nama Divisi</label>
+            <input type="text" id="nama" placeholder="cth. Engineering" class="form-input" required>
+          </div>
+
+          <div class="a4">
+            <label class="form-label" for="deskripsi">Deskripsi</label>
+            <textarea id="deskripsi" placeholder="Tuliskan deskripsi singkat tentang divisi ini..." class="form-textarea" required></textarea>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="flex items-center gap-3 a5">
+            <button type="submit" class="btn-primary">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              Simpan Divisi
+            </button>
+            <a href="divisi-list.html" class="btn-ghost">Batal</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("createForm");
+    let divisiData = JSON.parse(localStorage.getItem("divisiData")) || [];
+
+    const namaInput = document.getElementById("nama");
+    const descInput = document.getElementById("deskripsi");
+
+    namaInput.addEventListener("input", function() {
+      const val = this.value.trim();
+      document.getElementById("previewIcon").textContent = val ? val.charAt(0).toUpperCase() : "?";
+      document.getElementById("previewTitle").textContent = val || "Nama divisi akan muncul di sini";
+    });
+
+    descInput.addEventListener("input", function() {
+      const val = this.value.trim();
+      document.getElementById("previewDesc").textContent = val || "Deskripsi divisi akan muncul di sini setelah kamu mengisi form di sebelah kanan.";
+    });
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const newDivisi = {
+        id: Date.now(),
+        nama: namaInput.value,
+        deskripsi: descInput.value
+      };
+      divisiData.push(newDivisi);
+      localStorage.setItem("divisiData", JSON.stringify(divisiData));
+      window.location.href = "divisi-list.html";
+    });
+  </script>
+
+  <script>
+    fetch('../components/sidebar.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+      });
+  </script>
+
+</body>
+</html>

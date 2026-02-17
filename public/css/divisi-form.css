@@ -1,0 +1,144 @@
+* { font-family: 'Geist', sans-serif; box-sizing: border-box; }
+
+body { background: #f5f6fa; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.a1 { animation: fadeUp .45s .05s both; }
+.a2 { animation: fadeUp .45s .12s both; }
+.a3 { animation: fadeUp .45s .19s both; }
+.a4 { animation: fadeUp .45s .26s both; }
+.a5 { animation: fadeUp .45s .33s both; }
+
+.split-left {
+  width: 380px; flex-shrink: 0;
+  background: #111827;
+  border-radius: 22px;
+  padding: 48px 40px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  position: sticky; top: 32px;
+  align-self: flex-start;
+}
+
+.split-right {
+  flex: 1;
+  padding: 0 0 0 48px;
+}
+
+.preview-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: rgba(255,255,255,.1);
+  border: 1.5px solid rgba(255,255,255,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: #fff;
+  font-family: 'Geist', sans-serif;
+  margin-bottom: 28px;
+  transition: all .3s;
+}
+
+.preview-title {
+  font-size: 26px; font-weight: 800;
+  color: #fff; line-height: 1.2;
+  margin-bottom: 10px; word-break: break-word;
+  min-height: 64px;
+}
+
+.preview-desc {
+  font-size: 14px; color: rgba(255,255,255,.4);
+  line-height: 1.7; word-break: break-word;
+  min-height: 48px;
+}
+
+.preview-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 99px; padding: 6px 14px;
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,.5);
+  letter-spacing: .1em; text-transform: uppercase;
+  margin-top: 32px;
+}
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: #9ca3af;
+  text-decoration: none; transition: color .2s;
+}
+.back-btn:hover { color: #111827; }
+
+.form-label {
+  display: block;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: #9ca3af; margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 13px 16px;
+  background: #fff;
+  border: 1.5px solid #ebebf0;
+  border-radius: 12px;
+  font-size: 15px; font-weight: 500;
+  color: #111827; outline: none;
+  transition: all .2s;
+  font-family: 'Geist', sans-serif;
+}
+.form-input:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17,24,39,.07);
+}
+.form-input::placeholder { color: #d1d5db; font-weight: 400; }
+
+.form-textarea {
+  width: 100%;
+  padding: 13px 16px;
+  background: #fff;
+  border: 1.5px solid #ebebf0;
+  border-radius: 12px;
+  font-size: 15px; font-weight: 500;
+  color: #111827; outline: none;
+  transition: all .2s; resize: vertical;
+  font-family: 'Geist', sans-serif;
+  min-height: 130px; line-height: 1.6;
+}
+.form-textarea:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17,24,39,.07);
+}
+.form-textarea::placeholder { color: #d1d5db; font-weight: 400; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 28px; border-radius: 12px;
+  background: #111827; color: #fff;
+  font-size: 14px; font-weight: 600;
+  border: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(17,24,39,.18);
+  transition: all .25s;
+  font-family: 'Geist', sans-serif;
+}
+.btn-primary:hover { background: #1f2937; transform: translateY(-1px); box-shadow: 0 6px 22px rgba(17,24,39,.26); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 24px; border-radius: 12px;
+  background: transparent; color: #6b7280;
+  font-size: 14px; font-weight: 600;
+  border: 1.5px solid #e5e7eb; cursor: pointer;
+  text-decoration: none; transition: all .25s;
+  font-family: 'Geist', sans-serif;
+}
+.btn-ghost:hover { border-color: #9ca3af; color: #374151; }
+
+.divider { height: 1.5px; background: #f3f4f6; margin: 28px 0; }
+
+.form-section-title {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: #d1d5db; margin-bottom: 20px;
+}

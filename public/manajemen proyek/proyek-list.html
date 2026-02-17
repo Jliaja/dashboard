@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Proyek</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/proyek-list.css">
+</head>
+<body class="min-h-screen flex">
+
+  <div id="sidebar-container"></div>
+
+  <main class="flex-1 overflow-y-auto p-8 space-y-6">
+
+    <div class="a1 flex items-center justify-between">
+      <div>
+        <p class="text-[10px] font-bold tracking-[.2em] uppercase text-gray-400 mb-1">Manajemen</p>
+        <h1 class="font-extrabold text-4xl text-gray-900 leading-tight">Kelola Proyek</h1>
+        <p class="text-sm text-gray-400 mt-1">Manajemen proyek perusahaan</p>
+      </div>
+      <a href="proyek-form.html" class="btn-primary">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+        </svg>
+        Tambah Proyek
+      </a>
+    </div>
+
+    <div class="card p-7 a2">
+      <div class="flex items-center justify-between mb-6">
+        <p class="text-sm font-semibold text-gray-700">Semua Proyek</p>
+        <div class="count-chip">Total <span id="projCount">0</span> proyek</div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama Proyek</th>
+              <th>Klien</th>
+              <th>Status</th>
+              <th>Tanggal</th>
+              <th>PIC</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="proyekTable">
+            <tr><td colspan="7"><div class="empty-state">
+              <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              Belum ada data proyek
+            </div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let proyekData = JSON.parse(localStorage.getItem("proyekData")) || [];
+
+    function saveData() { localStorage.setItem("proyekData", JSON.stringify(proyekData)); }
+
+    function getBadgeClass(status) {
+      if (status === 'Planning') return 'badge-planning';
+      if (status === 'On Progress') return 'badge-progress';
+      if (status === 'Completed') return 'badge-completed';
+      return 'badge-planning';
+    }
+
+    function renderTable() {
+      const table = document.getElementById("proyekTable");
+      document.getElementById("projCount").textContent = proyekData.length;
+
+      if (proyekData.length === 0) {
+        table.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+          <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Belum ada data proyek
+        </div></td></tr>`;
+        return;
+      }
+
+      table.innerHTML = proyekData.map((p, index) => `
+        <tr>
+          <td><span class="no-badge">${index + 1}</span></td>
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="proj-icon">${p.nama.charAt(0).toUpperCase()}</div>
+              <span class="font-semibold text-gray-900">${p.nama}</span>
+            </div>
+          </td>
+          <td class="text-gray-400">${p.klien}</td>
+          <td><span class="badge ${getBadgeClass(p.status)}"><span class="badge-dot"></span>${p.status}</span></td>
+          <td><span class="date-range">${p.mulai} — ${p.selesai}</span></td>
+          <td class="text-gray-500">${p.pic}</td>
+          <td>
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="editProyek(${p.id})" class="btn-edit">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Edit
+              </button>
+              <button onclick="deleteProyek(${p.id})" class="btn-del">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Hapus
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteProyek(id) {
+      if (!confirm("Yakin hapus proyek ini?")) return;
+      proyekData = proyekData.filter(p => p.id !== id);
+      saveData(); renderTable();
+    }
+
+    function editProyek(id) {
+      localStorage.setItem("editProyekId", id);
+      window.location.href = "proyek-edit.html";
+    }
+
+    renderTable();
+  </script>
+
+  <script>
+    fetch('../components/sidebar.html')
+      .then(res => res.text())
+      .then(data => { document.getElementById('sidebar-container').innerHTML = data; });
+  </script>
+
+</body>
+</html>

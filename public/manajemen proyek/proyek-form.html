@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tambah Proyek</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/proyek-form.css">
+</head>
+<body class="min-h-screen flex">
+
+  <div id="sidebar-container"></div>
+
+  <main class="flex-1 overflow-y-auto">
+    <div class="max-w-2xl mx-auto px-8 py-12">
+
+      <div class="flex items-center justify-between mb-16 a1">
+        <a href="proyek-list.html" class="back-btn">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          Kembali
+        </a>
+        <span class="text-xs font-semibold text-gray-300 tracking-widest uppercase">6 field</span>
+      </div>
+
+      <div class="mb-12 a2">
+        <p class="text-[10px] font-bold tracking-[.2em] uppercase text-gray-400 mb-3">Manajemen Proyek</p>
+        <h1 class="font-extrabold text-5xl text-gray-900 leading-tight">Tambah<br>Proyek Baru</h1>
+      </div>
+
+      <form id="createForm">
+
+        <div class="form-group a3">
+          <span class="step-num">01 &mdash; NAMA</span>
+          <label class="form-label" for="nama">Nama Proyek</label>
+          <input type="text" id="nama" placeholder="Website Redesign" class="form-input" required>
+        </div>
+
+        <div class="form-group a4">
+          <span class="step-num">02 &mdash; KLIEN</span>
+          <label class="form-label" for="klien">Nama Klien</label>
+          <input type="text" id="klien" placeholder="PT. Maju Bersama" class="form-input" required>
+        </div>
+
+        <div class="form-group a5">
+          <span class="step-num">03 &mdash; STATUS</span>
+          <label class="form-label" for="status">Status Proyek</label>
+          <select id="status" class="form-select">
+            <option>Planning</option>
+            <option>On Progress</option>
+            <option>Completed</option>
+          </select>
+        </div>
+
+        <div class="form-group a6">
+          <span class="step-num">04 &mdash; TANGGAL</span>
+          <div class="date-grid">
+            <div>
+              <label class="form-label" for="mulai">Tanggal Mulai</label>
+              <input type="date" id="mulai" class="form-input" required>
+            </div>
+            <div>
+              <label class="form-label" for="selesai">Tanggal Selesai</label>
+              <input type="date" id="selesai" class="form-input" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group a7">
+          <span class="step-num">05 &mdash; PIC</span>
+          <label class="form-label" for="pic">PIC (Karyawan)</label>
+          <input type="text" id="pic" placeholder="Budi Santoso" class="form-input" required>
+        </div>
+
+        <div class="flex items-center gap-4 pt-10 a8">
+          <button type="submit" class="btn-primary">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+            Simpan Proyek
+          </button>
+          <a href="proyek-list.html" class="btn-ghost">Batal</a>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <script>
+    let proyekData = JSON.parse(localStorage.getItem("proyekData")) || [];
+
+    document.getElementById("createForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const newProyek = {
+        id: Date.now(),
+        nama:    document.getElementById("nama").value,
+        klien:   document.getElementById("klien").value,
+        status:  document.getElementById("status").value,
+        mulai:   document.getElementById("mulai").value,
+        selesai: document.getElementById("selesai").value,
+        pic:     document.getElementById("pic").value
+      };
+      proyekData.push(newProyek);
+      localStorage.setItem("proyekData", JSON.stringify(proyekData));
+      window.location.href = "proyek-list.html";
+    });
+  </script>
+
+  <script>
+    fetch('../components/sidebar.html')
+      .then(res => res.text())
+      .then(data => { document.getElementById('sidebar-container').innerHTML = data; });
+  </script>
+
+</body>
+</html>

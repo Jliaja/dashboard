@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Divisi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/divisi-list.css">
+</head>
+<body class="min-h-screen flex">
+
+  <div id="sidebar-container"></div>
+
+  <main class="flex-1 overflow-y-auto p-8 space-y-6">
+
+    <!-- Header -->
+    <div class="a1 flex items-center justify-between">
+      <div>
+        <p class="text-[10px] font-bold tracking-[.2em] uppercase text-gray-400 mb-1">Manajemen</p>
+        <h1 class="font-extrabold text-4xl text-gray-900 leading-tight">Kelola Divisi</h1>
+        <p class="text-sm text-gray-400 mt-1">Manajemen data divisi perusahaan</p>
+      </div>
+      <a href="divisi-form.html" class="btn-primary">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+        </svg>
+        Tambah Divisi
+      </a>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card p-7 a2">
+
+      <!-- Toolbar -->
+      <div class="flex items-center justify-between mb-6">
+        <p class="text-sm font-semibold text-gray-700">Semua Divisi</p>
+        <div class="count-chip">
+          Total <span id="divCount">0</span> divisi
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama Divisi</th>
+              <th>Deskripsi</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="divisiTable">
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  </svg>
+                  Belum ada data divisi
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let divisiData = JSON.parse(localStorage.getItem("divisiData")) || [];
+
+    function saveData() {
+      localStorage.setItem("divisiData", JSON.stringify(divisiData));
+    }
+
+    function renderTable() {
+      const table = document.getElementById("divisiTable");
+      document.getElementById("divCount").textContent = divisiData.length;
+
+      if (divisiData.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+                Belum ada data divisi
+              </div>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      table.innerHTML = divisiData.map((divisi, index) => `
+        <tr>
+          <td><span class="no-badge">${index + 1}</span></td>
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="div-icon">${divisi.nama.charAt(0).toUpperCase()}</div>
+              <span class="font-semibold text-gray-900">${divisi.nama}</span>
+            </div>
+          </td>
+          <td class="text-gray-400">${divisi.deskripsi || '—'}</td>
+          <td>
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="editDivisi(${divisi.id})" class="btn-edit">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Edit
+              </button>
+              <button onclick="deleteDivisi(${divisi.id})" class="btn-del">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Hapus
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteDivisi(id) {
+      if (!confirm("Yakin hapus divisi ini?")) return;
+      divisiData = divisiData.filter(d => d.id !== id);
+      saveData();
+      renderTable();
+    }
+
+    function editDivisi(id) {
+      localStorage.setItem("editDivisiId", id);
+      window.location.href = "divisi-edit.html";
+    }
+
+    renderTable();
+  </script>
+
+  <script>
+    fetch('../components/sidebar.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+      });
+  </script>
+
+</body>
+</html>
