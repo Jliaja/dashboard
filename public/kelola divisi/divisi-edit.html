@@ -87,7 +87,8 @@
   </main>
 
   <script>
-const API = "/api/departments";
+    const API = "/api/departments";
+const token = localStorage.getItem("token");
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
@@ -153,6 +154,11 @@ form.addEventListener("submit", async function(e) {
 });
 
 loadData();
+fetch('../components/sidebar.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+      });
 </script>
 
 </body>

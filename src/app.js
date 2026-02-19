@@ -6,13 +6,13 @@ const authroutes = require('./routes/authroutes');
 const employeeRoutes = require('./routes/employeeroutes'); 
 const departmentRoutes = require('./routes/departmentroutes');
 const projectRoutes = require('./routes/projectroutes');
-
+const dashboardRoutes = require('./routes/dashboardroutes');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/projects', projectRoutes);
 // routes

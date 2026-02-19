@@ -56,7 +56,7 @@
           </span>
         </div>
         <p class="text-xs font-700 tracking-widest uppercase text-slate-400 mb-1">Total Karyawan</p>
-        <p id="totalEmployees" class="stat-num text-4xl font-800 text-gray-900 mb-1">24</p>
+        <p id="totalEmployees" class="stat-num text-4xl font-800 text-gray-900 mb-1"></p>
         <p class="text-xs text-slate-400">Active employees</p>
       </div>
 
@@ -70,7 +70,7 @@
           <span class="badge-blue text-xs font-700 px-2.5 py-1 rounded-lg">ACTIVE</span>
         </div>
         <p class="text-xs font-700 tracking-widest uppercase text-slate-400 mb-1">Total Divisi</p>
-        <p id="totalDivisions" class="stat-num text-4xl font-800 text-gray-900 mb-1">5</p>
+        <p id="totalDivisions" class="stat-num text-4xl font-800 text-gray-900 mb-1"></p>
         <p class="text-xs text-slate-400">Department divisions</p>
       </div>
 
@@ -86,7 +86,7 @@
           </span>
         </div>
         <p class="text-xs font-700 tracking-widest uppercase text-slate-400 mb-1">Total Proyek</p>
-        <p id="totalProjects" class="stat-num text-4xl font-800 text-gray-900 mb-1">12</p>
+        <p id="totalProjects" class="stat-num text-4xl font-800 text-gray-900 mb-1"></p>
         <p class="text-xs text-slate-400">Running projects</p>
       </div>
 
@@ -99,140 +99,69 @@
           <h3 class="syne font-700 text-xl text-gray-900">Analytics Overview</h3>
           <p class="text-sm text-slate-400 mt-0.5">Visual representation of your data</p>
         </div>
-        <div class="flex gap-2">
-          <button class="btn-primary">This Month</button>
-          <button class="btn-ghost">This Year</button>
-        </div>
       </div>
       <div class="chart-area chart-height">
         <canvas id="dashboardChart"></canvas>
       </div>
     </div>
 
-    <!-- Bottom Stats -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 a6">
-
-      <div class="bottom-card flex items-center gap-3">
-        <div class="icon-box grad-green-emerald">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="text-[10px] font-700 tracking-widest uppercase text-slate-400">Completed</p>
-          <p class="syne font-800 text-xl text-gray-900">89%</p>
-        </div>
-      </div>
-
-      <div class="bottom-card flex items-center gap-3">
-        <div class="icon-box grad-orange-red-soft">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="text-[10px] font-700 tracking-widest uppercase text-slate-400">Pending</p>
-          <p class="syne font-800 text-xl text-gray-900">23</p>
-        </div>
-      </div>
-
-      <div class="bottom-card flex items-center gap-3">
-        <div class="icon-box grad-blue-indigo">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-          </svg>
-        </div>
-        <div>
-          <p class="text-[10px] font-700 tracking-widest uppercase text-slate-400">Growth</p>
-          <p class="syne font-800 text-xl text-gray-900">+18%</p>
-        </div>
-      </div>
-
-      <div class="bottom-card flex items-center gap-3">
-        <div class="icon-box grad-purple-pink-soft">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="text-[10px] font-700 tracking-widest uppercase text-slate-400">Revenue</p>
-          <p class="syne font-800 text-xl text-gray-900">$24K</p>
-        </div>
-      </div>
-
     </div>
   </main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const role = localStorage.getItem('role');
-    const token = localStorage.getItem('token');
+<script>
+let dashboardChart;
 
-    if (!token || role !== 'admin') {
-      alert('Akses ditolak!');
-      window.location.href = '/login.html';
+function updateChart(emp, div, pro) {
+  const ctx = document.getElementById('dashboardChart').getContext('2d');
+
+  if (dashboardChart) dashboardChart.destroy();
+
+  dashboardChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Karyawan', 'Divisi', 'Proyek'],
+      datasets: [{
+        label: 'Jumlah Data',
+        data: [emp, div, pro],
+        backgroundColor: [
+          'rgba(59,130,246,.85)',
+          'rgba(139,92,246,.85)',
+          'rgba(249,115,22,.85)'
+        ],
+        borderRadius: 12
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
     }
+  });
+}
 
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      document.getElementById('adminEmail').innerText = payload.email;
-    } catch (e) { console.log('Error parsing token'); }
+async function loadDashboard() {
+  try {
+    const res = await fetch("/api/dashboard/stats");
+    const data = await res.json();
 
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      window.location.href = '/login.html';
-    }
-  </script>
+    document.getElementById("totalEmployees").textContent = data.totalEmployees;
+    document.getElementById("totalDivisions").textContent = data.totalDivisions;
+    document.getElementById("totalProjects").textContent = data.totalProjects;
 
-  <script>
-    const ctx = document.getElementById('dashboardChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Karyawan', 'Divisi', 'Proyek'],
-        datasets: [{
-          label: 'Jumlah Data',
-          data: [24, 5, 12],
-          backgroundColor: ['rgba(59,130,246,.85)', 'rgba(139,92,246,.85)', 'rgba(249,115,22,.85)'],
-          borderRadius: 12,
-          borderWidth: 0,
-          barPercentage: 0.6,
-          categoryPercentage: 0.8,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#fff',
-            padding: 12, cornerRadius: 12,
-            titleColor: '#1f2937', bodyColor: '#4b5563',
-            borderColor: '#e5e7eb', borderWidth: 1,
-            displayColors: false,
-            titleFont: { size: 12, weight: '600' },
-            bodyFont: { size: 14, weight: '700' }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { color: '#94a3b8', font: { size: 11 } },
-            grid: { color: '#f1f5f9' },
-            border: { display: false }
-          },
-          x: {
-            ticks: { color: '#475569', font: { size: 12, weight: '600' } },
-            grid: { display: false },
-            border: { display: false }
-          }
-        }
-      }
-    });
-  </script>
+    updateChart(
+      data.totalEmployees,
+      data.totalDivisions,
+      data.totalProjects
+    );
 
+  } catch (error) {
+    console.error("Dashboard error:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadDashboard);
+</script>
   <script>
   fetch('components/sidebar.html')
     .then(response => response.text())

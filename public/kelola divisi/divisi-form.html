@@ -82,6 +82,8 @@
 
   <script>
 const API = "/api/departments";
+const token = localStorage.getItem("token");
+
 
 const form = document.getElementById("createForm");
 const namaInput = document.getElementById("nama");
@@ -115,6 +117,11 @@ form.addEventListener("submit", async function(e) {
     alert("Terjadi error");
   }
 });
+fetch('../components/sidebar.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+      });
 </script>
 
 </body>

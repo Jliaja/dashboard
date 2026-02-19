@@ -70,7 +70,8 @@
   </main>
 
   <script>
-const API = "api/departments";
+    const token = localStorage.getItem("token");
+const API = "/api/departments";
 
 async function loadDivisi() {
   try {
@@ -116,9 +117,12 @@ async function loadDivisi() {
 async function deleteDivisi(id) {
   if (!confirm("Yakin hapus?")) return;
 
-  await fetch(API + "/" + id, {
-    method: "DELETE"
-  });
+await fetch(API + "/" + id, {
+  method: "DELETE",
+  headers: {
+    "Authorization": "Bearer " + token
+  }
+});
 
   loadDivisi();
 }
@@ -128,6 +132,11 @@ function editDivisi(id) {
 }
 
 loadDivisi();
+fetch('../components/sidebar.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+      });
 </script>
 
 
