@@ -55,9 +55,12 @@
           </div>
 
           <div>
-            <label class="form-label" for="division">Divisi</label>
-            <input id="division" type="text" placeholder="cth. Engineering" class="form-input">
-          </div>
+  <label class="form-label" for="division">Divisi</label>
+  <select id="division" class="form-select">
+    <option value="">Pilih Divisi</option>
+  </select>
+</div>
+
 
           <div>
             <label class="form-label" for="status">Status</label>
@@ -110,6 +113,31 @@ const res = await fetch('/api/employee', {
   },
   body: JSON.stringify(data) // data harus matching field di tabel Neon
 });
+// Ambil semua divisi
+async function loadDepartments() {
+  const token = localStorage.getItem('token');
+  try {
+    const res = await fetch('/api/department', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    const departments = await res.json();
+
+    const select = document.getElementById('division');
+    departments.forEach(dep => {
+      const option = document.createElement('option');
+      option.value = dep.name; // atau dep.id kalau mau simpan ID
+      option.textContent = dep.name;
+      select.appendChild(option);
+    });
+  } catch(err) {
+    console.error('Gagal load divisi', err);
+  }
+}
+
+// Panggil saat page load
+loadDepartments();
 
 
         const result = await res.json();
