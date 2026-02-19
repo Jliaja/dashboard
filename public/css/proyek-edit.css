@@ -91,4 +91,58 @@ body { background: #f5f6fa; }
   text-decoration: none; transition: all .25s;
   font-family: 'Geist', sans-serif;
 }
-.btn-ghost:hover { border-color: #9ca3af; color: #374151; }
+.btn-ghost:hover { border-color: #9ca3af; color: #374151; }/* --- Tom Select Customization (Match Form Theme) --- */
+.ts-control {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    padding: 16px 0 !important;
+    box-shadow: none !important;
+    font-size: 20px !important;
+    font-weight: 500 !important;
+    color: #111827 !important;
+    font-family: 'Geist', sans-serif !important;
+    min-height: auto !important;
+}
+
+.ts-wrapper.focus .ts-control {
+    border-bottom-color: #111827 !important;
+    box-shadow: none !important;
+}
+
+/* Hide default helper elements to keep it clean */
+.ts-wrapper.single .ts-control:after {
+    display: none !important;
+}
+
+/* Custom Dropdown */
+.ts-dropdown {
+    border: 1px solid #f3f4f6 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.1) !important;
+    padding: 8px !important;
+    margin-top: 8px !important;
+    z-index: 100 !important;
+    /* Ensure it floats above */
+}
+
+.ts-dropdown .option {
+    border-radius: 8px !important;
+    padding: 10px 16px !important;
+    font-size: 15px !important;
+    color: #4b5563 !important;
+}
+
+.ts-dropdown .option.active {
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+/* Adjust input within tom select */
+.ts-control input {
+    font-size: 20px !important;
+    font-weight: 500 !important;
+    font-family: 'Geist', sans-serif !important;
+    color: #111827 !important;
+}

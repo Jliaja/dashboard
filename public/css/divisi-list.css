@@ -1,4 +1,5 @@
 * { font-family: 'Geist', sans-serif; box-sizing: border-box; }
+.syne { font-family: 'Geist', sans-serif; font-weight: 800; }
 
 body { background: #f5f6fa; }
 
@@ -28,6 +29,17 @@ body { background: #f5f6fa; }
   font-family: 'Geist', sans-serif;
 }
 .btn-primary:hover { background: #1f2937; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(17,24,39,.25); }
+
+/* ── Search ── */
+.search-box {
+  background: #f5f6fa; border: 1.5px solid #ebebf0;
+  border-radius: 12px; padding: 10px 16px;
+  font-size: 14px; color: #111827; outline: none;
+  transition: all .2s; width: 280px;
+  font-family: 'Geist', sans-serif;
+}
+.search-box:focus { background: #fff; border-color: #111827; box-shadow: 0 0 0 3px rgba(17,24,39,.07); }
+.search-box::placeholder { color: #9ca3af; }
 
 .tbl-wrap { border-radius: 16px; overflow: hidden; border: 1.5px solid #ebebf0; }
 

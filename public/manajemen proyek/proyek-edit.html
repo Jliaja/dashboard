@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Proyek</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/proyek-edit.css">
+  <link rel="stylesheet" href="../vendor/tom-select/css/tom-select.default.min.css">
+  <script src="../js/sidebar.js"></script>
 </head>
+
 <body class="min-h-screen flex">
 
   <div id="sidebar-container"></div>
@@ -18,13 +23,14 @@
       <div class="flex items-center justify-between mb-16 a1">
         <a href="proyek-list.html" class="back-btn">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Kembali
         </a>
         <span class="edit-badge">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
           Mode Edit
         </span>
@@ -73,16 +79,18 @@
           </div>
         </div>
 
-        <div class="form-group a7">
+        <div class="form-group a7 relative z-50">
           <span class="step-num">05 &mdash; PIC</span>
           <label class="form-label" for="pic">PIC (Karyawan)</label>
-          <input type="text" id="pic" placeholder="Budi Santoso" class="form-input" required>
+          <select id="pic" required>
+            <option value="">Pilih Karyawan</option>
+          </select>
         </div>
 
         <div class="flex items-center gap-4 pt-10 a8">
           <button type="submit" class="btn-primary">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
             Simpan Perubahan
           </button>
@@ -94,78 +102,128 @@
   </main>
 
   <script>
-const API = "/api/projects";
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
 
-if (!id) {
-  alert("ID tidak ditemukan");
-  window.location.href = "proyek-list.html";
-}
+    const API = "/api/projects";
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
 
-const namaInput = document.getElementById("nama");
-const klienInput = document.getElementById("klien");
-const statusInput = document.getElementById("status");
-const mulaiInput = document.getElementById("mulai");
-const selesaiInput = document.getElementById("selesai");
-const picInput = document.getElementById("pic");
-
-async function loadData() {
-  try {
-    const res = await fetch(API + "/" + id);
-    if (!res.ok) {
-      alert("Project tidak ditemukan");
-      return;
+    if (!id) {
+      alert("ID tidak ditemukan");
+      window.location.href = "proyek-list.html";
     }
 
-    const data = await res.json();
+    const namaInput = document.getElementById("nama");
+    const klienInput = document.getElementById("klien");
+    const statusInput = document.getElementById("status");
+    const mulaiInput = document.getElementById("mulai");
+    const selesaiInput = document.getElementById("selesai");
+    const picInput = document.getElementById("pic");
 
-    namaInput.value = data.name;
-    klienInput.value = data.client;
-    statusInput.value = data.status;
-    mulaiInput.value = data.start_date?.split("T")[0];
-    selesaiInput.value = data.end_date?.split("T")[0];
-    picInput.value = data.pic;
+    async function loadData() {
+      try {
+        const res = await fetch(API + "/" + id);
+        if (!res.ok) {
+          alert("Project tidak ditemukan");
+          return;
+        }
 
-  } catch (err) {
-    console.error(err);
-    alert("Gagal load data");
-  }
-}
+        const data = await res.json();
 
-document.getElementById("editForm")
-.addEventListener("submit", async function(e) {
-  e.preventDefault();
+        namaInput.value = data.name;
+        klienInput.value = data.client;
+        statusInput.value = data.status;
+        mulaiInput.value = data.start_date?.split("T")[0];
+        selesaiInput.value = data.end_date?.split("T")[0];
+        mulaiInput.value = data.start_date?.split("T")[0];
+        selesaiInput.value = data.end_date?.split("T")[0];
 
-  try {
-    const res = await fetch(API + "/" + id, {
-  headers: {
-    'Authorization': 'Bearer ' + token
-  }
-});
+        // Set value via Tom Select
+        // We know it is initialized because loadEmployees() finishes first
+        picInput.tomselect.setValue(data.employee_id);
 
-
-    if (!res.ok) {
-      alert("Gagal update");
-      return;
+      } catch (err) {
+        console.error(err);
+        alert("Gagal load data");
+      }
     }
 
-    window.location.href = "proyek-list.html";
+    async function loadEmployees() {
+      try {
+        const res = await fetch('/api/employee', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        const employees = data.rows || data;
+        employees.forEach(emp => {
+          const option = document.createElement('option');
+          option.value = emp.id;
+          option.textContent = emp.name;
+          picInput.appendChild(option);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
-  } catch (err) {
-    console.error(err);
-    alert("Terjadi error update");
-  }
-});
+    document.getElementById("editForm")
+      .addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-loadData();
-</script>
+        try {
+          const res = await fetch(API + "/" + id, {
+            method: 'PUT', // Explicitly use PUT
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              name: namaInput.value,
+              client: klienInput.value,
+              status: statusInput.value,
+              start_date: mulaiInput.value,
+              end_date: selesaiInput.value,
+              employee_id: picInput.value
+            })
+          });
+
+
+          if (!res.ok) {
+            alert("Gagal update");
+            return;
+          }
+
+          window.location.href = "proyek-list.html";
+
+        } catch (err) {
+          console.error(err);
+          alert("Terjadi error update");
+        }
+      });
+
+    // Load employees first, then data
+    loadEmployees().then(() => {
+      // Init Tom Select
+      new TomSelect("#pic", {
+        create: false,
+        sortField: { field: "text", direction: "asc" }
+      });
+
+      loadData();
+    });
+  </script>
+  <script src="../vendor/tom-select/js/tom-select.complete.min.js"></script>
 
   <script>
     fetch('../components/sidebar.html')
       .then(res => res.text())
-      .then(data => { document.getElementById('sidebar-container').innerHTML = data; });
+      .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+        loadUser();
+      });
   </script>
 
 </body>
+
 </html>

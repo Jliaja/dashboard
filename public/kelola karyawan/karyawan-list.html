@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../css/karyawan-list.css">
+  <script src="../js/sidebar.js"></script>
 </head>
 
 <body class="min-h-screen flex">
@@ -188,6 +189,7 @@
       .then(res => res.text())
       .then(data => {
         document.getElementById('sidebar-container').innerHTML = data;
+        loadUser();
       });
   </script>
 

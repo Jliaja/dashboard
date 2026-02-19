@@ -1,6 +1,6 @@
 require('dotenv').config(); // HARUS paling atas
 
-const app = require('./src/app');
+const app = require('./src/app'); // Trigger restart
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

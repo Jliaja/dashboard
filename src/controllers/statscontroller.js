@@ -5,7 +5,7 @@ exports.getStats = (req, res) => {
     SELECT 
     (SELECT COUNT(*) FROM employees) AS totalEmployees,
     (SELECT COUNT(*) FROM departments) AS totalDepartments,
-    (SELECT COUNT(*) FROM projects WHERE status='ongoing') AS activeProjects
+    (SELECT COUNT(*) FROM projects WHERE status='On Progress') AS totalProjects
   `;
 
   db.query(sql, (err, results) => {

@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tambah Proyek</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/proyek-form.css">
+  <link rel="stylesheet" href="../vendor/tom-select/css/tom-select.default.min.css">
+  <script src="../js/sidebar.js"></script>
 </head>
+
 <body class="min-h-screen flex">
 
   <div id="sidebar-container"></div>
@@ -18,7 +23,7 @@
       <div class="flex items-center justify-between mb-16 a1">
         <a href="proyek-list.html" class="back-btn">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Kembali
         </a>
@@ -68,16 +73,18 @@
           </div>
         </div>
 
-        <div class="form-group a7">
+        <div class="form-group a7 relative z-50">
           <span class="step-num">05 &mdash; PIC</span>
           <label class="form-label" for="pic">PIC (Karyawan)</label>
-          <input type="text" id="pic" placeholder="Budi Santoso" class="form-input" required>
+          <select id="pic" required>
+            <option value="">Pilih Karyawan</option>
+          </select>
         </div>
 
         <div class="flex items-center gap-4 pt-10 a8">
           <button type="submit" class="btn-primary">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
             Simpan Proyek
           </button>
@@ -90,51 +97,83 @@
 
   <script>
     const token = localStorage.getItem('token');
-if (!token) window.location.href = '/login.html';
+    if (!token) window.location.href = '/login.html';
 
-const API = "/api/projects";
+    const API = "/api/projects";
 
-document.getElementById("createForm")
-.addEventListener("submit", async function(e) {
-  e.preventDefault();
+    document.getElementById("createForm")
+      .addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-  try {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-          },
-      body: JSON.stringify({
-        name: document.getElementById("nama").value,
-        client: document.getElementById("klien").value,
-        status: document.getElementById("status").value,
-        start_date: document.getElementById("mulai").value,
-        end_date: document.getElementById("selesai").value,
-        pic: document.getElementById("pic").value
-      })
-    });
+        try {
+          const res = await fetch(API, {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              name: document.getElementById("nama").value,
+              client: document.getElementById("klien").value,
+              status: document.getElementById("status").value,
+              start_date: document.getElementById("mulai").value,
+              end_date: document.getElementById("selesai").value,
+              employee_id: document.getElementById("pic").value
+            })
+          });
 
-    if (!res.ok) {
-      alert("Gagal tambah project");
-      return;
+          if (!res.ok) {
+            alert("Gagal tambah project");
+            return;
+          }
+
+          window.location.href = "proyek-list.html";
+
+        } catch (err) {
+          console.error(err);
+          alert("Terjadi error");
+        }
+      });
+
+    async function loadEmployees() {
+      try {
+        const res = await fetch('/api/employee', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        const employees = data.rows || data;
+        const select = document.getElementById('pic');
+        employees.forEach(emp => {
+          const option = document.createElement('option');
+          option.value = emp.id;
+          option.textContent = emp.name;
+          select.appendChild(option);
+        });
+
+        // Init Tom Select
+        new TomSelect("#pic", {
+          create: false,
+          sortField: { field: "text", direction: "asc" }
+        });
+
+      } catch (err) {
+        console.error(err);
+      }
     }
-
-    window.location.href = "proyek-list.html";
-
-  } catch (err) {
-    console.error(err);
-    alert("Terjadi error");
-  }
-});
-</script>
+    loadEmployees();
+  </script>
+  <script src="../vendor/tom-select/js/tom-select.complete.min.js"></script>
 
 
   <script>
     fetch('../components/sidebar.html')
       .then(res => res.text())
-      .then(data => { document.getElementById('sidebar-container').innerHTML = data; });
+      .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+        loadUser();
+      });
   </script>
 
 </body>
+
 </html>

@@ -1,8 +1,14 @@
 const db = require('../config/db');
 
 /* ================= GET ALL ================= */
+/* ================= GET ALL ================= */
 exports.getAll = (req, res) => {
-  const sql = 'SELECT * FROM projects ORDER BY id ASC';
+  const sql = `
+    SELECT p.*, e.name as pic
+    FROM projects p
+    LEFT JOIN employees e ON p.employee_id = e.id
+    ORDER BY p.id ASC
+  `;
 
   db.query(sql, (err, result) => {
     if (err) return res.status(500).json(err);
@@ -12,18 +18,19 @@ exports.getAll = (req, res) => {
 
 
 /* ================= CREATE ================= */
+/* ================= CREATE ================= */
 exports.create = (req, res) => {
-  const { name, client, status, start_date, end_date, pic } = req.body;
+  const { name, client, status, start_date, end_date, employee_id } = req.body;
 
   const sql = `
-    INSERT INTO projects (name, client, status, start_date, end_date, pic)
+    INSERT INTO projects (name, client, status, start_date, end_date, employee_id)
     VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *
   `;
 
   db.query(
     sql,
-    [name, client, status, start_date, end_date, pic],
+    [name, client, status, start_date, end_date, employee_id],
     (err, result) => {
       if (err) return res.status(500).json(err);
 
@@ -37,9 +44,10 @@ exports.create = (req, res) => {
 
 
 /* ================= UPDATE ================= */
+/* ================= UPDATE ================= */
 exports.update = (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { name, client, status, start_date, end_date, pic } = req.body;
+  const { name, client, status, start_date, end_date, employee_id } = req.body;
 
   const sql = `
     UPDATE projects
@@ -48,14 +56,14 @@ exports.update = (req, res) => {
         status=$3,
         start_date=$4,
         end_date=$5,
-        pic=$6
+        employee_id=$6
     WHERE id=$7
     RETURNING *
   `;
 
   db.query(
     sql,
-    [name, client, status, start_date, end_date, pic, id],
+    [name, client, status, start_date, end_date, employee_id, id],
     (err, result) => {
       if (err) return res.status(500).json(err);
 
@@ -89,7 +97,12 @@ exports.remove = (req, res) => {
 exports.getById = (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const sql = 'SELECT * FROM projects WHERE id=$1';
+  const sql = `
+    SELECT p.*, e.name as pic_name
+    FROM projects p
+    LEFT JOIN employees e ON p.employee_id = e.id
+    WHERE p.id=$1
+  `;
 
   db.query(sql, [id], (err, result) => {
     if (err) return res.status(500).json(err);

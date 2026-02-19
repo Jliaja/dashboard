@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tambah Divisi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/divisi-form.css">
+  <script src="../js/sidebar.js"></script>
 </head>
+
 <body class="min-h-screen flex">
 
   <div id="sidebar-container"></div>
@@ -18,7 +22,7 @@
     <div class="mb-8 a1">
       <a href="divisi-list.html" class="back-btn">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         Kembali ke Daftar
       </a>
@@ -31,13 +35,16 @@
       <div class="split-left">
         <div>
           <div class="preview-icon" id="previewIcon">?</div>
-          <p class="text-xs font-bold tracking-widest uppercase mb-4" style="color:rgba(255,255,255,.25);">Preview Divisi</p>
+          <p class="text-xs font-bold tracking-widest uppercase mb-4" style="color:rgba(255,255,255,.25);">Preview
+            Divisi</p>
           <div class="preview-title" id="previewTitle">Nama divisi akan muncul di sini</div>
-          <div class="preview-desc" id="previewDesc">Deskripsi divisi akan muncul di sini setelah kamu mengisi form di sebelah kanan.</div>
+          <div class="preview-desc" id="previewDesc">Deskripsi divisi akan muncul di sini setelah kamu mengisi form di
+            sebelah kanan.</div>
         </div>
         <div class="preview-tag">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
           </svg>
           Divisi Baru
         </div>
@@ -60,7 +67,8 @@
 
           <div class="a4">
             <label class="form-label" for="deskripsi">Deskripsi</label>
-            <textarea id="deskripsi" placeholder="Tuliskan deskripsi singkat tentang divisi ini..." class="form-textarea" required></textarea>
+            <textarea id="deskripsi" placeholder="Tuliskan deskripsi singkat tentang divisi ini..."
+              class="form-textarea" required></textarea>
           </div>
 
           <div class="divider"></div>
@@ -68,7 +76,7 @@
           <div class="flex items-center gap-3 a5">
             <button type="submit" class="btn-primary">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
               </svg>
               Simpan Divisi
             </button>
@@ -81,48 +89,50 @@
   </main>
 
   <script>
-const API = "/api/departments";
-const token = localStorage.getItem("token");
+    const API = "/api/departments";
+    const token = localStorage.getItem("token");
 
 
-const form = document.getElementById("createForm");
-const namaInput = document.getElementById("nama");
-const descInput = document.getElementById("deskripsi");
+    const form = document.getElementById("createForm");
+    const namaInput = document.getElementById("nama");
+    const descInput = document.getElementById("deskripsi");
 
-form.addEventListener("submit", async function(e) {
-  e.preventDefault();
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-  try {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: {
+      try {
+        const res = await fetch(API, {
+          method: "POST",
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token
           },
-      body: JSON.stringify({
-        name: namaInput.value,
-        description: descInput.value
-      })
+          body: JSON.stringify({
+            name: namaInput.value,
+            description: descInput.value
+          })
+        });
+
+        if (!res.ok) {
+          alert("Gagal tambah divisi");
+          return;
+        }
+
+        window.location.href = "divisi-list.html";
+
+      } catch (err) {
+        console.error(err);
+        alert("Terjadi error");
+      }
     });
-
-    if (!res.ok) {
-      alert("Gagal tambah divisi");
-      return;
-    }
-
-    window.location.href = "divisi-list.html";
-
-  } catch (err) {
-    console.error(err);
-    alert("Terjadi error");
-  }
-});
-fetch('../components/sidebar.html')
+    fetch('../components/sidebar.html')
       .then(res => res.text())
       .then(data => {
         document.getElementById('sidebar-container').innerHTML = data;
+        loadUser();
       });
-</script>
+  </script>
 
 </body>
+
 </html>

@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../css/karyawan-edit.css">
+  <link rel="stylesheet" href="../vendor/tom-select/css/tom-select.default.min.css">
+  <script src="../js/sidebar.js"></script>
 </head>
 
 <body class="min-h-screen flex">
@@ -74,7 +76,7 @@
 
           <div>
             <label class="form-label" for="department_id">Divisi</label>
-            <select id="department_id" class="form-select">
+            <select id="department_id" required>
               <option value="">Pilih Divisi</option>
             </select>
           </div>
@@ -197,11 +199,19 @@
           const option = document.createElement('option');
           option.value = dept.id;
           option.textContent = dept.name;
-          if (selectedId && dept.id === selectedId) {
-            option.selected = true;
-          }
           deptSelect.appendChild(option);
         });
+
+        // Init Tom Select
+        const ts = new TomSelect("#department_id", {
+          create: false,
+          sortField: { field: "text", direction: "asc" }
+        });
+
+        if (selectedId) {
+          ts.setValue(selectedId);
+        }
+
       } catch (err) {
         console.error('Gagal load departments:', err);
       }
@@ -211,10 +221,12 @@
       .then(res => res.text())
       .then(data => {
         document.getElementById('sidebar-container').innerHTML = data;
+        loadUser();
       });
     loadEmployee();
 
   </script>
+  <script src="../vendor/tom-select/js/tom-select.complete.min.js"></script>
 
 </body>
 

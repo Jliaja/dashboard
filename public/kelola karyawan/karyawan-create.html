@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../css/karyawan-create.css">
+  <link rel="stylesheet" href="../vendor/tom-select/css/tom-select.default.min.css">
+  <script src="../js/sidebar.js"></script>
 </head>
 
 <body class="min-h-screen flex">
@@ -59,7 +61,7 @@
 
           <div>
             <label class="form-label" for="department_id">Divisi</label>
-            <select id="department_id" class="form-select">
+            <select id="department_id">
               <option value="">Pilih Divisi</option>
             </select>
           </div>
@@ -140,6 +142,7 @@
       .then(res => res.text())
       .then(data => {
         document.getElementById('sidebar-container').innerHTML = data;
+        loadUser();
       });
 
     // Load Departments
@@ -157,12 +160,20 @@
           option.textContent = dept.name;
           deptSelect.appendChild(option);
         });
+
+        // Init Tom Select
+        new TomSelect("#department_id", {
+          create: false,
+          sortField: { field: "text", direction: "asc" }
+        });
+
       } catch (err) {
         console.error('Gagal load departments:', err);
       }
     }
     loadDepartments();
   </script>
+  <script src="../vendor/tom-select/js/tom-select.complete.min.js"></script>
 
 </body>
 

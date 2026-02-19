@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kelola Proyek</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/proyek-list.css">
+  <script src="../js/sidebar.js"></script>
 </head>
+
 <body class="min-h-screen flex">
 
   <div id="sidebar-container"></div>
@@ -16,13 +20,13 @@
 
     <div class="a1 flex items-center justify-between">
       <div>
-        <p class="text-[10px] font-bold tracking-[.2em] uppercase text-gray-400 mb-1">Manajemen</p>
-        <h1 class="font-extrabold text-4xl text-gray-900 leading-tight">Kelola Proyek</h1>
+        <p class="syne text-[10px] font-bold tracking-[.2em] uppercase text-gray-400 mb-1">Manajemen</p>
+        <h1 class="syne font-extrabold text-4xl text-gray-900 leading-tight">Kelola Proyek</h1>
         <p class="text-sm text-gray-400 mt-1">Manajemen proyek perusahaan</p>
       </div>
       <a href="proyek-form.html" class="btn-primary">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
         </svg>
         Tambah Proyek
       </a>
@@ -30,7 +34,15 @@
 
     <div class="card p-7 a2">
       <div class="flex items-center justify-between mb-6">
-        <p class="text-sm font-semibold text-gray-700">Semua Proyek</p>
+        <div class="relative">
+          <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" placeholder="Cari proyek, klien..." class="search-box" style="padding-left:40px"
+            oninput="filterTable(this.value)">
+        </div>
         <div class="count-chip">Total <span id="projCount">0</span> proyek</div>
       </div>
 
@@ -48,12 +60,18 @@
             </tr>
           </thead>
           <tbody id="proyekTable">
-            <tr><td colspan="7"><div class="empty-state">
-              <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-              Belum ada data proyek
-            </div></td></tr>
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Belum ada data proyek
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -63,101 +81,125 @@
 
   <script>
     const token = localStorage.getItem('token');
-if (!token) window.location.href = '/login.html';
+    if (!token) window.location.href = '/login.html';
 
-const API = "/api/projects";
+    const API = "/api/projects";
+    let allData = [];
 
-function getBadgeClass(status) {
-  if (status === 'Planning') return 'badge-planning';
-  if (status === 'On Progress') return 'badge-progress';
-  if (status === 'Completed') return 'badge-completed';
-  return 'badge-planning';
-}
-
-async function loadProjects() {
-  try {
-    const res = await fetch(API, {
-  headers: {
-    'Authorization': 'Bearer ' + token
-  }
-});
-
-    const data = await res.json();
-
-    const table = document.getElementById("proyekTable");
-    document.getElementById("projCount").textContent = data.length;
-
-    if (!data.length) {
-      table.innerHTML = `
-        <tr><td colspan="7">
-          <div class="empty-state">Belum ada data proyek</div>
-        </td></tr>`;
-      return;
+    function getBadgeClass(status) {
+      if (status === 'Planning') return 'badge-planning';
+      if (status === 'On Progress') return 'badge-progress';
+      if (status === 'Completed') return 'badge-completed';
+      return 'badge-planning';
     }
 
-    table.innerHTML = data.map((p, index) => `
-      <tr>
-        <td><span class="no-badge">${index + 1}</span></td>
-        <td>
-          <div class="flex items-center gap-3">
-            <div class="proj-icon">${p.name.charAt(0).toUpperCase()}</div>
-            <span class="font-semibold text-gray-900">${p.name}</span>
-          </div>
-        </td>
-        <td class="text-gray-400">${p.client}</td>
-        <td>
-          <span class="badge ${getBadgeClass(p.status)}">
-            <span class="badge-dot"></span>${p.status}
-          </span>
-        </td>
-        <td>
-          <span class="date-range">
-            ${p.start_date} — ${p.end_date}
-          </span>
-        </td>
-        <td class="text-gray-500">${p.pic}</td>
-        <td>
-          <div class="flex gap-2">
-            <button onclick="editProject(${p.id})" class="btn-edit">Edit</button>
-            <button onclick="deleteProject(${p.id})" class="btn-del">Hapus</button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
+    function renderTable(data) {
+      const table = document.getElementById("proyekTable");
+      document.getElementById("projCount").textContent = data.length;
 
-  } catch (err) {
-    console.error(err);
-    alert("Gagal load project");
-  }
-}
+      if (!data.length) {
+        table.innerHTML = `
+          <tr><td colspan="7">
+            <div class="empty-state">Belum ada data proyek</div>
+          </td></tr>`;
+        return;
+      }
 
-async function deleteProject(id) {
-  if (!confirm("Yakin hapus?")) return;
+      table.innerHTML = data.map((p, index) => `
+        <tr>
+          <td><span class="no-badge">${index + 1}</span></td>
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="proj-icon">${p.name.charAt(0).toUpperCase()}</div>
+              <span class="font-semibold text-gray-900">${p.name}</span>
+            </div>
+          </td>
+          <td class="text-gray-400">${p.client}</td>
+          <td>
+            <span class="badge ${getBadgeClass(p.status)}">
+              <span class="badge-dot"></span>${p.status}
+            </span>
+          </td>
+          <td>
+            <span class="date-range">
+              ${p.start_date} — ${p.end_date}
+            </span>
+          </td>
+          <td class="text-gray-500">${p.pic}</td>
+          <td>
+            <div class="flex gap-2">
+              <a href="proyek-edit.html?id=${p.id}" class="btn-edit">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Edit
+              </a>
+              <button onclick="deleteProject(${p.id})" class="btn-del">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Hapus
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
 
-  await fetch(API + "/" + id, {
-  method: "DELETE",
-  headers: {
-    'Authorization': 'Bearer ' + token
-  }
-});
+    function filterTable(q) {
+      const filtered = allData.filter(p =>
+        p.name.toLowerCase().includes(q.toLowerCase()) ||
+        p.client.toLowerCase().includes(q.toLowerCase()) ||
+        p.pic.toLowerCase().includes(q.toLowerCase()) ||
+        p.status.toLowerCase().includes(q.toLowerCase())
+      );
+      renderTable(filtered);
+    }
 
+    async function loadProjects() {
+      try {
+        const res = await fetch(API, {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
 
-  loadProjects();
-}
+        const data = await res.json();
+        allData = data;
+        renderTable(allData);
 
-function editProject(id) {
-  window.location.href = "proyek-edit.html?id=" + id;
-}
+      } catch (err) {
+        console.error(err);
+        alert("Gagal load project");
+      }
+    }
 
-loadProjects();
-</script>
+    async function deleteProject(id) {
+      if (!confirm("Yakin hapus?")) return;
+
+      await fetch(API + "/" + id, {
+        method: "DELETE",
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
+
+      loadProjects();
+    }
+
+    loadProjects();
+  </script>
 
 
   <script>
     fetch('../components/sidebar.html')
       .then(res => res.text())
-      .then(data => { document.getElementById('sidebar-container').innerHTML = data; });
+      .then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+        loadUser();
+      });
   </script>
 
 </body>
+
 </html>

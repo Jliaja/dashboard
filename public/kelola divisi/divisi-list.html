@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kelola Divisi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/divisi-list.css">
+  <script src="../js/sidebar.js"></script>
 </head>
+
 <body class="min-h-screen flex">
 
   <div id="sidebar-container"></div>
@@ -17,13 +21,13 @@
     <!-- Header -->
     <div class="a1 flex items-center justify-between">
       <div>
-        <p class="text-[10px] font-bold tracking-[.2em] uppercase text-gray-400 mb-1">Manajemen</p>
-        <h1 class="font-extrabold text-4xl text-gray-900 leading-tight">Kelola Divisi</h1>
+        <p class="syne text-[10px] font-bold tracking-[.2em] uppercase text-gray-400 mb-1">Manajemen</p>
+        <h1 class="syne font-extrabold text-4xl text-gray-900 leading-tight">Kelola Divisi</h1>
         <p class="text-sm text-gray-400 mt-1">Manajemen data divisi perusahaan</p>
       </div>
       <a href="divisi-form.html" class="btn-primary">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
         </svg>
         Tambah Divisi
       </a>
@@ -34,7 +38,15 @@
 
       <!-- Toolbar -->
       <div class="flex items-center justify-between mb-6">
-        <p class="text-sm font-semibold text-gray-700">Semua Divisi</p>
+        <div class="relative">
+          <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" placeholder="Cari divisi..." class="search-box" style="padding-left:40px"
+            oninput="filterTable(this.value)">
+        </div>
         <div class="count-chip">
           Total <span id="divCount">0</span> divisi
         </div>
@@ -55,8 +67,10 @@
             <tr>
               <td colspan="4">
                 <div class="empty-state">
-                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                   Belum ada data divisi
                 </div>
@@ -71,74 +85,98 @@
 
   <script>
     const token = localStorage.getItem("token");
-const API = "/api/departments";
+    const API = "/api/departments";
+    let allData = [];
 
-async function loadDivisi() {
-  try {
-    const res = await fetch(API);
-    const data = await res.json();
+    function renderTable(data) {
+      const table = document.getElementById("divisiTable");
+      document.getElementById("divCount").textContent = data.length;
 
-    const table = document.getElementById("divisiTable");
-    document.getElementById("divCount").textContent = data.length;
+      if (!data.length) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">Belum ada data divisi</div>
+            </td>
+          </tr>`;
+        return;
+      }
 
-    if (!data.length) {
-      table.innerHTML = `
+      table.innerHTML = data.map((divisi, index) => `
         <tr>
-          <td colspan="4">
-            <div class="empty-state">Belum ada data divisi</div>
+          <td>${index + 1}</td>
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="div-icon">${divisi.name.charAt(0).toUpperCase()}</div>
+              <div>
+                <p class="font-semibold text-gray-900 syne text-sm">${divisi.name}</p>
+              </div>
+            </div>
           </td>
-        </tr>`;
-      return;
+          <td class="text-gray-500 text-sm">${divisi.description || '-'}</td>
+          <td>
+            <div class="flex items-center justify-center gap-2">
+              <a href="divisi-edit.html?id=${divisi.id}" class="btn-edit">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Edit
+              </a>
+              <button onclick="deleteDivisi(${divisi.id})" class="btn-del">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Hapus
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
     }
 
-    table.innerHTML = data.map((divisi, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td>
-          <div class="flex items-center gap-3">
-            <div class="div-icon">${divisi.name.charAt(0).toUpperCase()}</div>
-            <span class="font-semibold">${divisi.name}</span>
-          </div>
-        </td>
-        <td>${divisi.description || '-'}</td>
-        <td>
-          <button onclick="editDivisi(${divisi.id})">Edit</button>
-          <button onclick="deleteDivisi(${divisi.id})">Hapus</button>
-        </td>
-      </tr>
-    `).join('');
+    function filterTable(q) {
+      const filtered = allData.filter(d =>
+        d.name.toLowerCase().includes(q.toLowerCase()) ||
+        (d.description || '').toLowerCase().includes(q.toLowerCase())
+      );
+      renderTable(filtered);
+    }
 
-  } catch (err) {
-    console.error(err);
-    alert("Gagal load data divisi");
-  }
-}
+    async function loadDivisi() {
+      try {
+        const res = await fetch(API);
+        const data = await res.json();
+        allData = data;
+        renderTable(allData);
+      } catch (err) {
+        console.error(err);
+        alert("Gagal load data divisi");
+      }
+    }
 
-async function deleteDivisi(id) {
-  if (!confirm("Yakin hapus?")) return;
+    async function deleteDivisi(id) {
+      if (!confirm("Yakin hapus?")) return;
 
-await fetch(API + "/" + id, {
-  method: "DELETE",
-  headers: {
-    "Authorization": "Bearer " + token
-  }
-});
+      await fetch(API + "/" + id, {
+        method: "DELETE",
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      });
 
-  loadDivisi();
-}
+      loadDivisi();
+    }
 
-function editDivisi(id) {
-  window.location.href = "divisi-edit.html?id=" + id;
-}
-
-loadDivisi();
-fetch('../components/sidebar.html')
+    loadDivisi();
+    fetch('../components/sidebar.html')
       .then(res => res.text())
       .then(data => {
         document.getElementById('sidebar-container').innerHTML = data;
+        loadUser();
       });
-</script>
+  </script>
 
 
 </body>
+
 </html>
