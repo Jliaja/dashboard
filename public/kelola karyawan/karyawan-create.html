@@ -94,16 +94,17 @@ if (!token) window.location.href = '/login.html';
 
 // Load divisi saat page load
 async function loadDepartments() {
+  const token = localStorage.getItem('token'); // kalo pake auth
   try {
-    const res = await fetch('/api/department', {
-      headers: { 'Authorization': 'Bearer ' + token }
+    const res = await fetch('/api/departments', {
+      headers: token ? { 'Authorization': 'Bearer ' + token } : {}
     });
     const departments = await res.json();
 
     const select = document.getElementById('division');
     departments.forEach(dep => {
       const option = document.createElement('option');
-      option.value = dep.name; // bisa juga dep.id kalau mau simpan ID
+      option.value = dep.name; // atau dep.id kalau mau simpan ID
       option.textContent = dep.name;
       select.appendChild(option);
     });
@@ -111,7 +112,10 @@ async function loadDepartments() {
     console.error('Gagal load divisi', err);
   }
 }
+
+// Panggil saat page load
 loadDepartments();
+
 
 // Form submit
 document.getElementById('form').addEventListener('submit', async (e) => {
