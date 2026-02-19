@@ -87,58 +87,73 @@
   </main>
 
   <script>
-    const form = document.getElementById("editForm");
-    let divisiData = JSON.parse(localStorage.getItem("divisiData")) || [];
-    let editId = localStorage.getItem("editDivisiId");
+const API = "/api/departments";
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
-    if (!editId) {
-      alert("Data tidak ditemukan!");
-      window.location.href = "divisi-list.html";
+if (!id) {
+  alert("ID tidak ditemukan");
+  window.location.href = "divisi-list.html";
+}
+
+const form = document.getElementById("editForm");
+const namaInput = document.getElementById("nama");
+const descInput = document.getElementById("deskripsi");
+
+async function loadData() {
+  try {
+    const res = await fetch(API + "/" + id);
+    if (!res.ok) {
+      alert("Data tidak ditemukan");
+      return;
     }
 
-    const namaInput = document.getElementById("nama");
-    const descInput = document.getElementById("deskripsi");
+    const data = await res.json();
+    namaInput.value = data.name;
+    descInput.value = data.description;
 
-    const divisi = divisiData.find(d => d.id == editId);
-    if (divisi) {
-      namaInput.value = divisi.nama;
-      descInput.value = divisi.deskripsi;
-      document.getElementById("previewIcon").textContent = divisi.nama.charAt(0).toUpperCase();
-      document.getElementById("previewTitle").textContent = divisi.nama;
-      document.getElementById("previewDesc").textContent = divisi.deskripsi;
+    document.getElementById("previewIcon").textContent =
+      data.name.charAt(0).toUpperCase();
+    document.getElementById("previewTitle").textContent = data.name;
+    document.getElementById("previewDesc").textContent = data.description;
+
+  } catch (err) {
+    console.error(err);
+    alert("Gagal load data");
+  }
+}
+
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  try {
+    const res = await fetch(API + "/" + id, {
+      method: "PUT",
+      headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+      body: JSON.stringify({
+        name: namaInput.value,
+        description: descInput.value
+      })
+    });
+
+    if (!res.ok) {
+      alert("Gagal update");
+      return;
     }
 
-    namaInput.addEventListener("input", function() {
-      const val = this.value.trim();
-      document.getElementById("previewIcon").textContent = val ? val.charAt(0).toUpperCase() : "?";
-      document.getElementById("previewTitle").textContent = val || "Nama divisi";
-    });
+    window.location.href = "divisi-list.html";
 
-    descInput.addEventListener("input", function() {
-      const val = this.value.trim();
-      document.getElementById("previewDesc").textContent = val || "Deskripsi divisi.";
-    });
+  } catch (err) {
+    console.error(err);
+    alert("Terjadi error saat update");
+  }
+});
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-      divisiData = divisiData.map(d =>
-        d.id == editId
-          ? { ...d, nama: namaInput.value, deskripsi: descInput.value }
-          : d
-      );
-      localStorage.setItem("divisiData", JSON.stringify(divisiData));
-      localStorage.removeItem("editDivisiId");
-      window.location.href = "divisi-list.html";
-    });
-  </script>
-
-  <script>
-    fetch('../components/sidebar.html')
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById('sidebar-container').innerHTML = data;
-      });
-  </script>
+loadData();
+</script>
 
 </body>
 </html>

@@ -114,25 +114,6 @@
     const divisionInput = document.getElementById('division');
     const statusInput   = document.getElementById('status');
 
-    async function loadEmployee() {
-      try {
-        const res  = await fetch('/api/employees');
-        const data = await res.json();
-        const emp  = data.find(e => e.id == id);
-
-        if (!emp) { alert("Data tidak ditemukan"); return; }
-
-        nameInput.value     = emp.name;
-        emailInput.value    = emp.email;
-        positionInput.value = emp.position;
-        divisionInput.value = emp.division;
-        statusInput.value   = emp.status;
-
-      } catch (err) {
-        console.error(err);
-        alert("Gagal load data");
-      }
-    }
 
     document.getElementById('form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -146,7 +127,7 @@
       };
 
       try {
-        const res = await fetch('/api/employees/' + id, {
+        const res = await fetch('/api/employee/' + id, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -169,15 +150,34 @@
       }
     });
 
-    loadEmployee();
-  </script>
+    async function loadEmployee() {
+  if (!id) return; // kalau id ga ada, skip
 
-  <script>
+  try {
+    const res = await fetch('/api/employee/' + id, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok) { alert("Gagal load data karyawan"); return; }
+    const emp = await res.json();
+
+    // isi form
+    nameInput.value     = emp.name;
+    emailInput.value    = emp.email;
+    positionInput.value = emp.position;
+    divisionInput.value = emp.division || '';
+    statusInput.value   = emp.status.toLowerCase() === 'aktif' ? 'aktif' : 'nonaktif';
+  } catch (err) {
+    console.error(err);
+    alert("Terjadi error saat load data");
+  }
+}
     fetch('../components/sidebar.html')
       .then(res => res.text())
       .then(data => {
         document.getElementById('sidebar-container').innerHTML = data;
       });
+      loadEmployee();
+
   </script>
 
 </body>

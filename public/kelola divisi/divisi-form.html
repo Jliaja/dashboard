@@ -81,43 +81,41 @@
   </main>
 
   <script>
-    const form = document.getElementById("createForm");
-    let divisiData = JSON.parse(localStorage.getItem("divisiData")) || [];
+const API = "/api/departments";
 
-    const namaInput = document.getElementById("nama");
-    const descInput = document.getElementById("deskripsi");
+const form = document.getElementById("createForm");
+const namaInput = document.getElementById("nama");
+const descInput = document.getElementById("deskripsi");
 
-    namaInput.addEventListener("input", function() {
-      const val = this.value.trim();
-      document.getElementById("previewIcon").textContent = val ? val.charAt(0).toUpperCase() : "?";
-      document.getElementById("previewTitle").textContent = val || "Nama divisi akan muncul di sini";
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+      body: JSON.stringify({
+        name: namaInput.value,
+        description: descInput.value
+      })
     });
 
-    descInput.addEventListener("input", function() {
-      const val = this.value.trim();
-      document.getElementById("previewDesc").textContent = val || "Deskripsi divisi akan muncul di sini setelah kamu mengisi form di sebelah kanan.";
-    });
+    if (!res.ok) {
+      alert("Gagal tambah divisi");
+      return;
+    }
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-      const newDivisi = {
-        id: Date.now(),
-        nama: namaInput.value,
-        deskripsi: descInput.value
-      };
-      divisiData.push(newDivisi);
-      localStorage.setItem("divisiData", JSON.stringify(divisiData));
-      window.location.href = "divisi-list.html";
-    });
-  </script>
+    window.location.href = "divisi-list.html";
 
-  <script>
-    fetch('../components/sidebar.html')
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById('sidebar-container').innerHTML = data;
-      });
-  </script>
+  } catch (err) {
+    console.error(err);
+    alert("Terjadi error");
+  }
+});
+</script>
 
 </body>
 </html>

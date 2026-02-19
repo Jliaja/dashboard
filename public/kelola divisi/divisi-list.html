@@ -70,83 +70,66 @@
   </main>
 
   <script>
-    let divisiData = JSON.parse(localStorage.getItem("divisiData")) || [];
+const API = "api/departments";
 
-    function saveData() {
-      localStorage.setItem("divisiData", JSON.stringify(divisiData));
-    }
+async function loadDivisi() {
+  try {
+    const res = await fetch(API);
+    const data = await res.json();
 
-    function renderTable() {
-      const table = document.getElementById("divisiTable");
-      document.getElementById("divCount").textContent = divisiData.length;
+    const table = document.getElementById("divisiTable");
+    document.getElementById("divCount").textContent = data.length;
 
-      if (divisiData.length === 0) {
-        table.innerHTML = `
-          <tr>
-            <td colspan="4">
-              <div class="empty-state">
-                <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                </svg>
-                Belum ada data divisi
-              </div>
-            </td>
-          </tr>`;
-        return;
-      }
-
-      table.innerHTML = divisiData.map((divisi, index) => `
+    if (!data.length) {
+      table.innerHTML = `
         <tr>
-          <td><span class="no-badge">${index + 1}</span></td>
-          <td>
-            <div class="flex items-center gap-3">
-              <div class="div-icon">${divisi.nama.charAt(0).toUpperCase()}</div>
-              <span class="font-semibold text-gray-900">${divisi.nama}</span>
-            </div>
+          <td colspan="4">
+            <div class="empty-state">Belum ada data divisi</div>
           </td>
-          <td class="text-gray-400">${divisi.deskripsi || '—'}</td>
-          <td>
-            <div class="flex items-center justify-center gap-2">
-              <button onclick="editDivisi(${divisi.id})" class="btn-edit">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-                Edit
-              </button>
-              <button onclick="deleteDivisi(${divisi.id})" class="btn-del">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-                Hapus
-              </button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+        </tr>`;
+      return;
     }
 
-    function deleteDivisi(id) {
-      if (!confirm("Yakin hapus divisi ini?")) return;
-      divisiData = divisiData.filter(d => d.id !== id);
-      saveData();
-      renderTable();
-    }
+    table.innerHTML = data.map((divisi, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>
+          <div class="flex items-center gap-3">
+            <div class="div-icon">${divisi.name.charAt(0).toUpperCase()}</div>
+            <span class="font-semibold">${divisi.name}</span>
+          </div>
+        </td>
+        <td>${divisi.description || '-'}</td>
+        <td>
+          <button onclick="editDivisi(${divisi.id})">Edit</button>
+          <button onclick="deleteDivisi(${divisi.id})">Hapus</button>
+        </td>
+      </tr>
+    `).join('');
 
-    function editDivisi(id) {
-      localStorage.setItem("editDivisiId", id);
-      window.location.href = "divisi-edit.html";
-    }
+  } catch (err) {
+    console.error(err);
+    alert("Gagal load data divisi");
+  }
+}
 
-    renderTable();
-  </script>
+async function deleteDivisi(id) {
+  if (!confirm("Yakin hapus?")) return;
 
-  <script>
-    fetch('../components/sidebar.html')
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById('sidebar-container').innerHTML = data;
-      });
-  </script>
+  await fetch(API + "/" + id, {
+    method: "DELETE"
+  });
+
+  loadDivisi();
+}
+
+function editDivisi(id) {
+  window.location.href = "divisi-edit.html?id=" + id;
+}
+
+loadDivisi();
+</script>
+
 
 </body>
 </html>

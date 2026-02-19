@@ -89,24 +89,46 @@
   </main>
 
   <script>
-    let proyekData = JSON.parse(localStorage.getItem("proyekData")) || [];
+    const token = localStorage.getItem('token');
+if (!token) window.location.href = '/login.html';
 
-    document.getElementById("createForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const newProyek = {
-        id: Date.now(),
-        nama:    document.getElementById("nama").value,
-        klien:   document.getElementById("klien").value,
-        status:  document.getElementById("status").value,
-        mulai:   document.getElementById("mulai").value,
-        selesai: document.getElementById("selesai").value,
-        pic:     document.getElementById("pic").value
-      };
-      proyekData.push(newProyek);
-      localStorage.setItem("proyekData", JSON.stringify(proyekData));
-      window.location.href = "proyek-list.html";
+const API = "/api/projects";
+
+document.getElementById("createForm")
+.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+      body: JSON.stringify({
+        name: document.getElementById("nama").value,
+        client: document.getElementById("klien").value,
+        status: document.getElementById("status").value,
+        start_date: document.getElementById("mulai").value,
+        end_date: document.getElementById("selesai").value,
+        pic: document.getElementById("pic").value
+      })
     });
-  </script>
+
+    if (!res.ok) {
+      alert("Gagal tambah project");
+      return;
+    }
+
+    window.location.href = "proyek-list.html";
+
+  } catch (err) {
+    console.error(err);
+    alert("Terjadi error");
+  }
+});
+</script>
+
 
   <script>
     fetch('../components/sidebar.html')

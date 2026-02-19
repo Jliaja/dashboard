@@ -94,38 +94,72 @@
   </main>
 
   <script>
-    let proyekData = JSON.parse(localStorage.getItem("proyekData")) || [];
-    let editId = localStorage.getItem("editProyekId");
+const API = "/api/projects";
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
-    const proyek = proyekData.find(p => p.id == editId);
-    if (proyek) {
-      document.getElementById("nama").value    = proyek.nama;
-      document.getElementById("klien").value   = proyek.klien;
-      document.getElementById("status").value  = proyek.status;
-      document.getElementById("mulai").value   = proyek.mulai;
-      document.getElementById("selesai").value = proyek.selesai;
-      document.getElementById("pic").value     = proyek.pic;
+if (!id) {
+  alert("ID tidak ditemukan");
+  window.location.href = "proyek-list.html";
+}
+
+const namaInput = document.getElementById("nama");
+const klienInput = document.getElementById("klien");
+const statusInput = document.getElementById("status");
+const mulaiInput = document.getElementById("mulai");
+const selesaiInput = document.getElementById("selesai");
+const picInput = document.getElementById("pic");
+
+async function loadData() {
+  try {
+    const res = await fetch(API + "/" + id);
+    if (!res.ok) {
+      alert("Project tidak ditemukan");
+      return;
     }
 
-    document.getElementById("editForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      proyekData = proyekData.map(p =>
-        p.id == editId
-          ? { ...p,
-              nama:    document.getElementById("nama").value,
-              klien:   document.getElementById("klien").value,
-              status:  document.getElementById("status").value,
-              mulai:   document.getElementById("mulai").value,
-              selesai: document.getElementById("selesai").value,
-              pic:     document.getElementById("pic").value
-            }
-          : p
-      );
-      localStorage.setItem("proyekData", JSON.stringify(proyekData));
-      localStorage.removeItem("editProyekId");
-      window.location.href = "proyek-list.html";
-    });
-  </script>
+    const data = await res.json();
+
+    namaInput.value = data.name;
+    klienInput.value = data.client;
+    statusInput.value = data.status;
+    mulaiInput.value = data.start_date?.split("T")[0];
+    selesaiInput.value = data.end_date?.split("T")[0];
+    picInput.value = data.pic;
+
+  } catch (err) {
+    console.error(err);
+    alert("Gagal load data");
+  }
+}
+
+document.getElementById("editForm")
+.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  try {
+    const res = await fetch(API + "/" + id, {
+  headers: {
+    'Authorization': 'Bearer ' + token
+  }
+});
+
+
+    if (!res.ok) {
+      alert("Gagal update");
+      return;
+    }
+
+    window.location.href = "proyek-list.html";
+
+  } catch (err) {
+    console.error(err);
+    alert("Terjadi error update");
+  }
+});
+
+loadData();
+</script>
 
   <script>
     fetch('../components/sidebar.html')

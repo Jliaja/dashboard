@@ -3,20 +3,24 @@ const cors = require('cors');
 const path = require('path');
 
 const authroutes = require('./routes/authroutes');
-const employeeroutes = require('./routes/employeeroutes');
-const statsroutes = require('./routes/statsroutes');
+const employeeRoutes = require('./routes/employeeroutes'); 
+const departmentRoutes = require('./routes/departmentroutes');
+const projectRoutes = require('./routes/projectroutes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// API dulu
-app.use('/api/auth', authroutes);
-app.use('/api/employees', employeeroutes);
-app.use('/api/stats', statsroutes);
 
-// Static terakhir
+app.use('/api/departments', departmentRoutes);
+app.use('/api/projects', projectRoutes);
+// routes
+app.use('/api/auth', authroutes);
+// employee
+app.use('/api/employee', employeeRoutes);
+
+// static files
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/', (req, res) => {
