@@ -90,44 +90,20 @@
 
   <script>
     const token = localStorage.getItem('token');
-    if (!token) window.location.href = '/login.html';
+if (!token) window.location.href = '/login.html';
 
-    document.getElementById('form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const data = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        position: document.getElementById('position').value,
-        division: document.getElementById('division').value,
-        status: document.getElementById('status').value
-      };
-
-      try {
-        // POST create karyawan
-const res = await fetch('/api/employee', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + token
-  },
-  body: JSON.stringify(data) // data harus matching field di tabel Neon
-});
-// Ambil semua divisi
+// Load divisi saat page load
 async function loadDepartments() {
-  const token = localStorage.getItem('token');
   try {
     const res = await fetch('/api/department', {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
+      headers: { 'Authorization': 'Bearer ' + token }
     });
     const departments = await res.json();
 
     const select = document.getElementById('division');
     departments.forEach(dep => {
       const option = document.createElement('option');
-      option.value = dep.name; // atau dep.id kalau mau simpan ID
+      option.value = dep.name; // bisa juga dep.id kalau mau simpan ID
       option.textContent = dep.name;
       select.appendChild(option);
     });
@@ -135,27 +111,46 @@ async function loadDepartments() {
     console.error('Gagal load divisi', err);
   }
 }
-
-// Panggil saat page load
 loadDepartments();
 
+// Form submit
+document.getElementById('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-        const result = await res.json();
-        console.log("Response:", result);
+  const data = {
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    position: document.getElementById('position').value,
+    division: document.getElementById('division').value,
+    status: document.getElementById('status').value
+  };
 
-        if (!res.ok) {
-          alert("Gagal: " + JSON.stringify(result));
-          return;
-        }
-
-        alert("Berhasil ditambahkan!");
-        window.location.href = 'karyawan-list.html';
-
-      } catch (err) {
-        console.error(err);
-        alert("Terjadi error!");
-      }
+  try {
+    const res = await fetch('/api/employee', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify(data)
     });
+
+    const result = await res.json();
+    console.log("Response:", result);
+
+    if (!res.ok) {
+      alert("Gagal: " + JSON.stringify(result));
+      return;
+    }
+
+    alert("Berhasil ditambahkan!");
+    window.location.href = 'karyawan-list.html';
+  } catch (err) {
+    console.error(err);
+    alert("Terjadi error!");
+  }
+});
+
   </script>
 
   <script>
