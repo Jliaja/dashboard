@@ -23,11 +23,11 @@
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.2.0",
     "autoprefixer": "^10.4.24",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.11",
     "postcss": "^8.5.6",
-    "sequelize-cli": "^6.6.5",
-    "tailwindcss": "^3.4.19"
+    "sequelize-cli": "^6.6.5"
   }
 }

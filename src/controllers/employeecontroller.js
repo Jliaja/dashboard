@@ -2,7 +2,12 @@ const db = require('../config/db');
 
 /* ================= GET ALL ================= */
 exports.getAll = (req, res) => {
-  const sql = 'SELECT * FROM employees';
+  const sql = `
+    SELECT e.*, d.name AS department_name
+    FROM employees e
+    LEFT JOIN departments d ON e.department_id = d.id
+    ORDER BY e.id ASC
+  `;
   db.query(sql, (err, result) => {  // db = node-postgres client
     if (err) return res.status(500).json(err);
     res.json(result.rows); // kirim array langsung
@@ -12,18 +17,18 @@ exports.getAll = (req, res) => {
 
 /* ================= CREATE ================= */
 exports.create = (req, res) => {
-  const { name, email, position, division, status } = req.body;
+  const { name, email, position, department_id, status } = req.body;
 
   const sql = `
-  INSERT INTO employees (name, email, position, division, status)
+  INSERT INTO employees (name, email, position, department_id, status)
   VALUES ($1, $2, $3, $4, $5)
   RETURNING *
 `;
 
-db.query(sql, [name, email, position, division, status], (err, result) => {
-  if (err) return res.status(500).json(err);
-  res.json({ message: 'Employee ditambahkan', employee: result.rows[0] });
-});
+  db.query(sql, [name, email, position, department_id, status], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: 'Employee ditambahkan', employee: result.rows[0] });
+  });
 
 };
 
@@ -31,29 +36,29 @@ db.query(sql, [name, email, position, division, status], (err, result) => {
 exports.update = (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const { name, email, position, division, status } = req.body;
+  const { name, email, position, department_id, status } = req.body;
 
   const sql = `
   UPDATE employees
-  SET name=$1, email=$2, position=$3, division=$4, status=$5
+  SET name=$1, email=$2, position=$3, department_id=$4, status=$5
   WHERE id=$6
   RETURNING *
 `;
 
-db.query(sql, [name, email, position, division, status, id], (err, result) => {
-  if (err) return res.status(500).json(err);
-  res.json({ message: 'Employee diupdate', employee: result.rows[0] });
-});
+  db.query(sql, [name, email, position, department_id, status, id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: 'Employee diupdate', employee: result.rows[0] });
+  });
 
 };
 
 /* ================= DELETE ================= */
 exports.remove = (req, res) => {
   const sql = 'DELETE FROM employees WHERE id=$1';
-db.query(sql, [parseInt(req.params.id, 10)], (err) => {
-  if (err) return res.status(500).json(err);
-  res.json({ message: 'Employee dihapus' });
-});
+  db.query(sql, [parseInt(req.params.id, 10)], (err) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: 'Employee dihapus' });
+  });
 
 };
 
@@ -61,7 +66,12 @@ db.query(sql, [parseInt(req.params.id, 10)], (err) => {
 exports.getById = (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  const sql = 'SELECT * FROM employees WHERE id=$1';
+  const sql = `
+    SELECT e.*, d.name AS department_name
+    FROM employees e
+    LEFT JOIN departments d ON e.department_id = d.id
+    WHERE e.id=$1
+  `;
 
   db.query(sql, [id], (err, result) => {
     if (err) return res.status(500).json(err);

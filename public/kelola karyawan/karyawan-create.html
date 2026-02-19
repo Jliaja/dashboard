@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tambah Karyawan</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/karyawan-create.css">
 </head>
+
 <body class="min-h-screen flex">
 
   <div id="sidebar-container"></div>
@@ -18,7 +21,7 @@
     <div class="mb-6 a1">
       <a href="karyawan-list.html" class="back-btn">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         Kembali ke Daftar
       </a>
@@ -55,8 +58,10 @@
           </div>
 
           <div>
-            <label class="form-label" for="division">Divisi</label>
-            <input id="division" type="text" placeholder="cth. Engineering" class="form-input">
+            <label class="form-label" for="department_id">Divisi</label>
+            <select id="department_id" class="form-select">
+              <option value="">Pilih Divisi</option>
+            </select>
           </div>
 
           <div>
@@ -72,7 +77,7 @@
           <div class="space-y-3 pt-1">
             <button type="submit" class="btn-primary">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
               </svg>
               Simpan Karyawan
             </button>
@@ -96,20 +101,20 @@
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
         position: document.getElementById('position').value,
-        division: document.getElementById('division').value,
+        department_id: document.getElementById('department_id').value,
         status: document.getElementById('status').value
       };
 
       try {
         // POST create karyawan
-const res = await fetch('/api/employee', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + token
-  },
-  body: JSON.stringify(data) // data harus matching field di tabel Neon
-});
+        const res = await fetch('/api/employee', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(data) // data harus matching field di tabel Neon
+        });
 
 
         const result = await res.json();
@@ -136,7 +141,29 @@ const res = await fetch('/api/employee', {
       .then(data => {
         document.getElementById('sidebar-container').innerHTML = data;
       });
+
+    // Load Departments
+    async function loadDepartments() {
+      try {
+        const res = await fetch('/api/departments', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const departments = await res.json();
+        const deptSelect = document.getElementById('department_id');
+
+        departments.forEach(dept => {
+          const option = document.createElement('option');
+          option.value = dept.id;
+          option.textContent = dept.name;
+          deptSelect.appendChild(option);
+        });
+      } catch (err) {
+        console.error('Gagal load departments:', err);
+      }
+    }
+    loadDepartments();
   </script>
 
 </body>
+
 </html>

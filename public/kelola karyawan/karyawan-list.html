@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daftar Karyawan</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/karyawan-list.css">
 </head>
+
 <body class="min-h-screen flex">
 
   <div id="sidebar-container"></div>
@@ -23,7 +26,7 @@
       </div>
       <a href="karyawan-create.html" class="btn-primary">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
         </svg>
         Tambah Karyawan
       </a>
@@ -35,10 +38,13 @@
       <!-- Toolbar -->
       <div class="flex items-center justify-between mb-6">
         <div class="relative">
-          <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input type="text" placeholder="Cari nama, email, jabatan..." class="search-box" style="padding-left:40px" oninput="filterTable(this.value)">
+          <input type="text" placeholder="Cari nama, email, jabatan..." class="search-box" style="padding-left:40px"
+            oninput="filterTable(this.value)">
         </div>
         <div class="count-chip">
           Total <span id="rowCount">0</span> karyawan
@@ -62,8 +68,10 @@
             <tr>
               <td colspan="6">
                 <div class="empty-state">
-                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   Memuat data...
                 </div>
@@ -109,7 +117,7 @@
           </td>
           <td class="text-gray-400 text-sm">${emp.email}</td>
           <td><span class="font-semibold text-gray-700 text-sm">${emp.position}</span></td>
-          <td class="text-gray-400 text-sm">${emp.division || '—'}</td>
+          <td class="text-gray-400 text-sm">${emp.department_name || '—'}</td>
           <td>
             <span class="badge ${emp.status.toLowerCase() === 'aktif' || emp.status.toLowerCase() === 'active' ? 'badge-active' : 'badge-inactive'}">
               <span class="badge-dot"></span>
@@ -141,28 +149,28 @@
         e.name.toLowerCase().includes(q.toLowerCase()) ||
         e.email.toLowerCase().includes(q.toLowerCase()) ||
         e.position.toLowerCase().includes(q.toLowerCase()) ||
-        (e.division || '').toLowerCase().includes(q.toLowerCase())
+        (e.department_name || '').toLowerCase().includes(q.toLowerCase())
       );
       renderTable(filtered);
     }
 
     async function loadEmployees() {
-  try {
-    const res = await fetch('/api/employee', {
+      try {
+        const res = await fetch('/api/employee', {
 
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
 
-    const data = await res.json();
-    console.log(data); // cek ini di console
+        const data = await res.json();
+        console.log(data); // cek ini di console
 
-    allData = data.rows || data;
-    renderTable(allData);
+        allData = data.rows || data;
+        renderTable(allData);
 
-  } catch (err) {
-    console.error(err);
-  }
-}
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
 
     async function deleteEmployee(id) {
@@ -175,14 +183,15 @@
     }
 
     loadEmployees();
- 
+
     fetch('../components/sidebar.html')
       .then(res => res.text())
       .then(data => {
         document.getElementById('sidebar-container').innerHTML = data;
       });
   </script>
-  
+
 
 </body>
+
 </html>
