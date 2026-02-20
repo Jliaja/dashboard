@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middlewares/auth');
 
 const controller = require('../controllers/projectcontroller');
 
@@ -12,12 +13,12 @@ router.get('/', controller.getAll);
 router.get('/:id', controller.getById);
 
 // CREATE
-router.post('/', controller.create);
+router.post('/', auth, controller.create);
 
 // UPDATE
-router.put('/:id', controller.update);
+router.put('/:id', auth, controller.update);
 
 // DELETE
-router.delete('/:id', controller.remove);
+router.delete('/:id', auth, controller.remove);
 
 module.exports = router;
