@@ -1,8 +1,4 @@
-// Kalau sudah login, langsung redirect
-const existingToken = localStorage.getItem('token');
-if (existingToken) {
-  window.location.href = '/dashboard.html';
-}
+// Auth check handled by auth-check.js
 
 const form = document.getElementById('loginForm');
 const errorMessage = document.getElementById('errorMessage');
@@ -47,7 +43,7 @@ form.addEventListener('submit', async (e) => {
     localStorage.setItem('token', data.token);
 
     // Redirect ke dashboard
-    window.location.href = '/dashboard.html';
+    window.location.href = '/admin-dashboard.html';
 
   } catch (error) {
     showError(error.message);
