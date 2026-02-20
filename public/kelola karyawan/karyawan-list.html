@@ -9,8 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../css/karyawan-list.css">
+  <link rel="stylesheet" href="../vendor/tom-select/css/tom-select.default.min.css">
   <script src="../vendor/sweetalert2/sweetalert2.min.js"></script>
   <script src="../js/sidebar.js"></script>
+  <script src="../vendor/tom-select/js/tom-select.complete.min.js"></script>
 </head>
 
 <body class="h-screen overflow-hidden flex">
@@ -45,18 +47,45 @@
     <div class="card p-5 md:p-7 a2">
 
       <!-- Toolbar -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div class="relative w-full md:w-auto">
-          <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
-            stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input type="text" placeholder="Cari nama, email, jabatan..." class="search-box w-full md:w-80"
-            style="padding-left:40px" oninput="filterTable(this.value)">
-        </div>
-        <div class="count-chip self-end md:self-auto">
-          Total <span id="rowCount">0</span> karyawan
+      <div class="flex flex-col gap-4 mb-6">
+        <div class="flex flex-col md:flex-row justify-between gap-4">
+
+          <!-- Left: Search & Filters -->
+          <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto flex-wrap">
+            <div class="relative w-full md:w-64">
+              <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="text" id="searchInput" placeholder="Cari karyawan..." class="search-box w-full"
+                style="padding-left:40px">
+            </div>
+
+            <div class="divisi-select-wrapper w-full md:w-64">
+              <select id="filterDept" placeholder="Semua Divisi" autocomplete="off">
+                <option value="">Semua Divisi</option>
+              </select>
+            </div>
+
+            <select id="filterStatus" class="search-box cursor-pointer w-full md:w-auto">
+              <option value="">Semua Status</option>
+              <option value="aktif">Aktif</option>
+              <option value="nonaktif">Nonaktif</option>
+            </select>
+
+            <select id="sortBy" class="search-box cursor-pointer w-full md:w-auto">
+              <option value="name_asc">Nama (A-Z)</option>
+              <option value="name_desc">Nama (Z-A)</option>
+              <option value="newest">Terbaru</option>
+              <option value="oldest">Terlama</option>
+            </select>
+          </div>
+
+          <!-- Right: Count -->
+          <div class="count-chip self-end md:self-center">
+            Total <span id="rowCount">0</span> karyawan
+          </div>
         </div>
       </div>
 
@@ -65,6 +94,7 @@
         <table class="w-full min-w-[800px]">
           <thead>
             <tr>
+              <th>No</th>
               <th>Nama</th>
               <th>Email</th>
               <th>Jabatan</th>
@@ -75,12 +105,14 @@
           </thead>
           <tbody id="employeeTable">
             <tr>
-              <td colspan="6">
+              <td colspan="7">
                 <div class="empty-state">
-                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor"
+                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200 animate-spin" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
                   </svg>
                   Memuat data...
                 </div>
@@ -110,12 +142,13 @@
       document.getElementById('rowCount').textContent = data.length;
 
       if (data.length === 0) {
-        table.innerHTML = `<tr><td colspan="6"><div class="empty-state">Tidak ada data karyawan</div></td></tr>`;
+        table.innerHTML = `<tr><td colspan="7"><div class="empty-state">Tidak ada data karyawan</div></td></tr>`;
         return;
       }
 
-      table.innerHTML = data.map(emp => `
+      table.innerHTML = data.map((emp, index) => `
         <tr>
+          <td><span class="no-badge">${index + 1}</span></td>
           <td>
             <div class="flex items-center gap-3">
               <div class="emp-avatar">${emp.name.charAt(0).toUpperCase()}</div>
@@ -153,28 +186,94 @@
       `).join('');
     }
 
-    function filterTable(q) {
-      const filtered = allData.filter(e =>
-        e.name.toLowerCase().includes(q.toLowerCase()) ||
-        e.email.toLowerCase().includes(q.toLowerCase()) ||
-        e.position.toLowerCase().includes(q.toLowerCase()) ||
-        (e.department_name || '').toLowerCase().includes(q.toLowerCase())
-      );
+    // Elements
+    const searchInput = document.getElementById('searchInput');
+    const filterDept = document.getElementById('filterDept');
+    const filterStatus = document.getElementById('filterStatus');
+    const sortBy = document.getElementById('sortBy');
+
+    // Event Listeners
+    searchInput.addEventListener('input', applyFilters);
+    filterDept.addEventListener('change', applyFilters);
+    filterStatus.addEventListener('change', applyFilters);
+    sortBy.addEventListener('change', applyFilters);
+
+    function applyFilters() {
+      let filtered = [...allData];
+      const q = searchInput.value.toLowerCase();
+      const dept = filterDept.value;
+      const status = filterStatus.value.toLowerCase();
+      const sort = sortBy.value;
+
+      // 1. Search
+      if (q) {
+        filtered = filtered.filter(e =>
+          e.name.toLowerCase().includes(q) ||
+          e.email.toLowerCase().includes(q) ||
+          e.position.toLowerCase().includes(q) ||
+          (e.department_name || '').toLowerCase().includes(q)
+        );
+      }
+
+      // 2. Filter Dept
+      if (dept) {
+        filtered = filtered.filter(e => e.department_id == dept);
+      }
+
+      // 3. Filter Status
+      if (status) {
+        filtered = filtered.filter(e => e.status.toLowerCase() === status);
+      }
+
+      // 4. Sorting
+      filtered.sort((a, b) => {
+        if (sort === 'name_asc') return a.name.localeCompare(b.name);
+        if (sort === 'name_desc') return b.name.localeCompare(a.name);
+        if (sort === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
+        if (sort === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
+        return 0;
+      });
+
       renderTable(filtered);
+    }
+
+    async function loadDepartments() {
+      try {
+        const res = await fetch('/api/departments', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const departments = await res.json();
+
+        // Populate filter dropdown
+        departments.forEach(d => {
+          const option = document.createElement('option');
+          option.value = d.id;
+          option.textContent = d.name;
+          filterDept.appendChild(option);
+        });
+
+        // Init Tom Select
+        new TomSelect('#filterDept', {
+          create: false,
+          sortField: { field: "text", direction: "asc" },
+          placeholder: 'Semua Divisi'
+        });
+
+      } catch (err) {
+        console.error('Gagal load departments', err);
+      }
     }
 
     async function loadEmployees() {
       try {
         const res = await fetch('/api/employee', {
-
           headers: { 'Authorization': 'Bearer ' + token }
         });
 
         const data = await res.json();
-        console.log(data); // cek ini di console
-
         allData = data.rows || data;
-        renderTable(allData);
+
+        applyFilters(); // Initial render with defaults
 
       } catch (err) {
         console.error(err);
@@ -218,6 +317,7 @@
       }
     }
 
+    loadDepartments();
     loadEmployees();
 
     fetch('../components/sidebar.html')

@@ -45,18 +45,39 @@
     <div class="card p-5 md:p-7 a2">
 
       <!-- Toolbar -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div class="relative w-full md:w-auto">
-          <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
-            stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input type="text" placeholder="Cari proyek, klien..." class="search-box w-full md:w-80"
-            style="padding-left:40px" oninput="filterTable(this.value)">
-        </div>
-        <div class="count-chip self-end md:self-auto">
-          Total <span id="projCount">0</span> proyek
+      <div class="flex flex-col gap-4 mb-6">
+        <div class="flex flex-col md:flex-row justify-between gap-4">
+
+          <!-- Filters -->
+          <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto flex-wrap">
+            <div class="relative w-full md:w-64">
+              <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="text" id="searchInput" placeholder="Cari proyek..." class="search-box w-full"
+                style="padding-left:40px">
+            </div>
+
+            <select id="filterStatus" class="search-box cursor-pointer w-full md:w-auto">
+              <option value="">Semua Status</option>
+              <option value="Planning">Planning</option>
+              <option value="On Progress">On Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+
+            <select id="sortBy" class="search-box cursor-pointer w-full md:w-auto">
+              <option value="name_asc">Nama (A-Z)</option>
+              <option value="name_desc">Nama (Z-A)</option>
+              <option value="deadline">Deadline Terdekat</option>
+              <option value="newest">Proyek Terbaru</option>
+            </select>
+          </div>
+
+          <div class="count-chip self-end md:self-center">
+            Total <span id="projCount">0</span> proyek
+          </div>
         </div>
       </div>
 
@@ -78,12 +99,14 @@
             <tr>
               <td colspan="7">
                 <div class="empty-state">
-                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor"
+                  <svg class="w-10 h-10 mx-auto mb-3 text-gray-200 animate-spin" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
                   </svg>
-                  Belum ada data proyek
+                  Memuat data...
                 </div>
               </td>
             </tr>
@@ -142,7 +165,7 @@
           </td>
           <td class="text-gray-500">${p.pic}</td>
           <td>
-            <div class="flex gap-2">
+            <div class="flex items-center justify-end gap-2">
               <a href="proyek-edit.html?id=${p.id}" class="btn-edit">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -161,13 +184,45 @@
       `).join('');
     }
 
-    function filterTable(q) {
-      const filtered = allData.filter(p =>
-        p.name.toLowerCase().includes(q.toLowerCase()) ||
-        p.client.toLowerCase().includes(q.toLowerCase()) ||
-        p.pic.toLowerCase().includes(q.toLowerCase()) ||
-        p.status.toLowerCase().includes(q.toLowerCase())
-      );
+    // Elements
+    const searchInput = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    const sortBy = document.getElementById('sortBy');
+
+    // Listeners
+    searchInput.addEventListener('input', applyFilters);
+    filterStatus.addEventListener('change', applyFilters);
+    sortBy.addEventListener('change', applyFilters);
+
+    function applyFilters() {
+      let filtered = [...allData];
+      const q = searchInput.value.toLowerCase();
+      const status = filterStatus.value;
+      const sort = sortBy.value;
+
+      // 1. Search
+      if (q) {
+        filtered = filtered.filter(p =>
+          p.name.toLowerCase().includes(q) ||
+          p.client.toLowerCase().includes(q) ||
+          p.pic.toLowerCase().includes(q)
+        );
+      }
+
+      // 2. Filter Status
+      if (status) {
+        filtered = filtered.filter(p => p.status === status);
+      }
+
+      // 4. Sort
+      filtered.sort((a, b) => {
+        if (sort === 'name_asc') return a.name.localeCompare(b.name);
+        if (sort === 'name_desc') return b.name.localeCompare(a.name);
+        if (sort === 'deadline') return new Date(a.end_date) - new Date(b.end_date);
+        if (sort === 'newest') return new Date(b.start_date) - new Date(a.start_date);
+        return 0;
+      });
+
       renderTable(filtered);
     }
 
@@ -181,7 +236,7 @@
 
         const data = await res.json();
         allData = data;
-        renderTable(allData);
+        applyFilters();
 
       } catch (err) {
         console.error(err);
