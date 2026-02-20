@@ -29,9 +29,15 @@ module.exports = {
         type: Sequelize.DATEONLY,
         allowNull: false
       },
-      pic: {
-        type: Sequelize.STRING,
-        allowNull: false
+      employee_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'employees',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       createdAt: {
         type: Sequelize.DATE,

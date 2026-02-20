@@ -1,4 +1,3 @@
-
 // sidebar.js
 
 async function logout() {
@@ -49,6 +48,44 @@ async function loadUser() {
     }
 }
 
-// Expose functions globally if needed (already global due to script inclusion, but good for clarity)
+// Sidebar Toggling Logic
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdropId = 'sidebar-backdrop';
+    let backdrop = document.getElementById(backdropId);
+
+    if (sidebar.classList.contains('-translate-x-full')) {
+        // Open sidebar
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('translate-x-0');
+
+        // Create backdrop if not exists
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.id = backdropId;
+            backdrop.className = 'fixed inset-0 bg-black/50 z-40 transition-opacity opacity-0 md:hidden';
+            document.body.appendChild(backdrop);
+
+            // Fade in
+            setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+
+            // Click to close
+            backdrop.addEventListener('click', toggleSidebar);
+        }
+    } else {
+        // Close sidebar
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+
+        // Remove backdrop
+        if (backdrop) {
+            backdrop.classList.add('opacity-0');
+            setTimeout(() => backdrop.remove(), 300);
+        }
+    }
+}
+
+// Expose functions globally
 window.logout = logout;
 window.loadUser = loadUser;
+window.toggleSidebar = toggleSidebar;
