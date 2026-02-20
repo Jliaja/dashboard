@@ -79,7 +79,7 @@ The frontend is served statically and can be accessed directly at the root URL.
 Detailed API documentation and testing instructions can be found in [API_TESTING.md](./API_TESTING.md).
 
 ### Base URL
-`http://localhost:5000/api`
+`http://localhost:5000/api` or `https://wicked-katleen-companyuhuy-cda70a58.koyeb.app`
 
 ### Key Endpoints
 *   `POST /api/auth/login` - User Login
