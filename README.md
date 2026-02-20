@@ -110,3 +110,7 @@ dashboard/
 ## 📄 License
 
 This project is licensed under the ISC License.
+
+## 🔴 Live Testing
+
+Test the project live on https://wicked-katleen-companyuhuy-cda70a58.koyeb.app/
