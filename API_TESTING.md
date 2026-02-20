@@ -2,7 +2,7 @@
 
 ## Base URL
 The base URL for all API requests is:
-`http://localhost:5000/api` or `https://wicked-katleen-companyuhuy-cda70a58.koyeb.app`
+`http://localhost:5000` or `https://wicked-katleen-companyuhuy-cda70a58.koyeb.app`
 
 ## Authentication
 Most endpoints (except GET methods) require authentication.
